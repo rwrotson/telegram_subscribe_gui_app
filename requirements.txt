@@ -1,0 +1,3 @@
+Telethon
+wxPython
+py2app
