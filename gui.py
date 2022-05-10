@@ -1,10 +1,12 @@
-import os
-from pathlib import Path
-import string
-import wx
 import logging
+import os
+import string
+from pathlib import Path
+
+import wx
 
 from telegram_api import follow_channels
+from constants import PREFS_FOLDER, USER_FILE_PATH, CHANNEL_FILE_PATH
 
 
 logging.basicConfig(
@@ -126,14 +128,10 @@ class MainWindow(Window):
         channels_window.Show()
 
     def OnFollowClick(self, evt):
-        print('enter follow')
         follow_channels()
-        print('exit follow')
 
     def OnUnfollowClick(self, evt):
-        print('enter unfollow')
         follow_channels(follow=False)
-        print('exit unfollow')
 
 
 class SideWindow(Window):
@@ -185,28 +183,44 @@ class UserWindow(SideWindow):
         self.info_text = wx.StaticText(self.panel)
         self.info_text.SetFont(self.font_large)
         self.info_text.SetLabel('ВВЕДИТЕ ДАННЫЕ ПОЛЬЗОВАТЕЛЯ')
-        self.id_text = wx.StaticText(self.panel, size=(110, 40))
+        self.id_text = wx.StaticText(self.panel, size=(120, 40))
         self.id_text.SetFont(self.font_large)
-        self.id_text.SetLabel('API_APP_ID')
-        self.hash_text = wx.StaticText(self.panel, size=(110, 40))
+        self.id_text.SetLabel('*API_APP_ID')
+        self.hash_text = wx.StaticText(self.panel, size=(120, 40))
         self.hash_text.SetFont(self.font_large)
-        self.hash_text.SetLabel('API_APP_HASH')
+        self.hash_text.SetLabel('*API_APP_HASH')
+        self.phone_text = wx.StaticText(self.panel, size=(120, 40))
+        self.phone_text.SetFont(self.font_large)
+        self.phone_text.SetLabel('*PHONE NUMBER')
+        self.password_text = wx.StaticText(self.panel, size=(120, 40))
+        self.password_text.SetFont(self.font_large)
+        self.password_text.SetLabel('TG PASSWORD')
+        self.notice_text = wx.StaticText(self.panel)
+        self.notice_text.SetFont(self.font_smallest)
+        self.notice_text.SetLabel('ПОЛЯ С * ОБЯЗАТЕЛЬНЫ ДЛЯ ЗАПОЛНЕНИЯ')
 
     def make_inputs(self):
-        self.id_input = UpperTextCtrl(self.panel, size=(190, 40))
+        self.id_input = UpperTextCtrl(self.panel, size=(180, 40))
         self.id_input.SetFont(self.font_large)
-        self.hash_input = UpperTextCtrl(self.panel, size=(190, 40))
+        self.hash_input = UpperTextCtrl(self.panel, size=(180, 40))
         self.hash_input.SetFont(self.font_large)
+        self.phone_input = UpperTextCtrl(self.panel, size=(180, 40))
+        self.phone_input.SetFont(self.font_large)
+        self.password_input = UpperTextCtrl(self.panel, size=(180, 40))
+        self.password_input.SetFont(self.font_large)
 
     def fill_inputs(self):
-        if os.path.exists('~/.telegram_subscribe_app/user.txt'):
-            with open('~/.telegram_subscribe_app/user.txt', 'r') as file:
-                user, hash = file.read().split(', ')
+        if os.path.exists(USER_FILE_PATH):
+            with open(USER_FILE_PATH, 'r') as file:
+                user, hash, phone, password = file.read().split(', ')
             self.id_input.WriteText(user)
             self.hash_input.WriteText(hash)
+            self.phone_input.WriteText(phone)
+            self.password_input.WriteText(password)
 
     def make_layout(self):
         self.vbox.Add(self.info_text, flag=wx.ALIGN_CENTER, proportion=0)
+        self.vbox.Add(self.notice_text, flag=wx.ALIGN_CENTER, proportion=0)
         self.vbox.AddStretchSpacer()
 
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -222,10 +236,22 @@ class UserWindow(SideWindow):
         self.vbox.AddStretchSpacer()
 
         hbox3 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox3.Add(self.back_button, proportion=0)
-        hbox3.AddSpacer(20)
-        hbox3.Add(self.save_button, proportion=0)
+        hbox3.Add(self.phone_text, proportion=0)
+        hbox3.Add(self.phone_input, proportion=0)
         self.vbox.Add(hbox3, flag=wx.ALIGN_CENTER, proportion=0)
+        self.vbox.AddStretchSpacer()
+
+        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox4.Add(self.password_text, proportion=0)
+        hbox4.Add(self.password_input, proportion=0)
+        self.vbox.Add(hbox4, flag=wx.ALIGN_CENTER, proportion=0)
+        self.vbox.AddStretchSpacer()
+
+        hbox5 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox5.Add(self.back_button, proportion=0)
+        hbox5.AddSpacer(20)
+        hbox5.Add(self.save_button, proportion=0)
+        self.vbox.Add(hbox5, flag=wx.ALIGN_CENTER, proportion=0)
         self.vbox.AddStretchSpacer()
         self.panel.SetSizer(self.vbox)
 
@@ -233,11 +259,13 @@ class UserWindow(SideWindow):
         """
         Save user's info into file
         """
-        os.makedirs('~/.telegram_subscribe_app/', exist_ok=True)
-        with open('~/.telegram_subscribe_app/user.txt', 'w') as f:
+        os.makedirs(PREFS_FOLDER, exist_ok=True)
+        with open(USER_FILE_PATH, 'w') as f:
             user_id = self.id_input.GetValue().strip(' ')
             user_hash = self.hash_input.GetValue().strip(' ')
-            f.write(f'{user_id}, {user_hash}')
+            user_phone = self.phone_input.GetValue().strip(' ')
+            user_password = self.password_input.GetValue().strip(' ')
+            f.write(f'{user_id}, {user_hash}, {user_phone}, {user_password}')
         self.OnBackClick(evt)
 
 
@@ -261,8 +289,8 @@ class ChannelsWindow(SideWindow):
         self.channels_input.SetFont(self.font_small)
 
     def fill_inputs(self):
-        if os.path.exists('~/.telegram_subscribe_app/channels.txt'):
-            with open('~/.telegram_subscribe_app/channels.txt', 'r') as f:
+        if os.path.exists(CHANNEL_FILE_PATH):
+            with open(CHANNEL_FILE_PATH, 'r') as f:
                 channels = f.read()
             self.channels_input.WriteText(channels)
 
@@ -286,8 +314,8 @@ class ChannelsWindow(SideWindow):
         """
         Save channels info into file
         """
-        os.makedirs('~/.telegram_subscribe_app/', exist_ok=True)
-        with open('~/.telegram_subscribe_app/channels.txt', 'w') as file:
+        os.makedirs(PREFS_FOLDER, exist_ok=True)
+        with open(CHANNEL_FILE_PATH, 'w') as file:
             channels = self.channels_input.GetValue()
             # turn into upper case
             channels = channels.upper()
@@ -327,11 +355,6 @@ class ReadMeWindow(SideWindow):
         self.vbox.Add(self.back_button,  flag=wx.ALIGN_CENTER, proportion=0)
         self.vbox.AddStretchSpacer()
         self.panel.SetSizer(self.vbox)
-
-
-class PopUpOk(wx.MessageBox):
-    def __init__(self):
-        pass
 
 
 if __name__ == '__main__':

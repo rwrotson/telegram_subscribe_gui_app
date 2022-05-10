@@ -3,7 +3,7 @@ from setuptools import setup
 APP = ['gui.py']
 DATA_FILES = ['telegram_api.py', ('', ['images']), ('', ['texts'])]
 OPTIONS = {
-    'argv_emulation': True,
+    'argv_emulation': False,
     'site_packages': True,
     'iconfile': 'appicon.icns',
     'packages': ['wx', 'telethon'],

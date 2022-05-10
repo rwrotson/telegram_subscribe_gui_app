@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+
+<p class="accordion" id="a1" style="border-top: 1px solid #999;">Panel 1</p>
+<div class="accordion-content" id="b1">
+  <p>
+    <p class="accordion" id="a2" style="border-top: 1px solid #999;">Panel 1</p>
+    <div class="accordion-content" id="b2">
+        <p>
+        Text line 1
+        <br/>
+        Text line 2
+        </p>
+    <br/>
+</div>
+    <br/>
+    Text line 2
+  </p>
+  <br/>
+</div>
+
+<p class="accordion" id="a1">Panel 2</p>
+<div class="accordion-content" id="b1">
+  <p>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum ea odit dicta illum adipisci, consequatur numquam veniam harum hic temporibus possimus esse voluptatem omnis necessitatibus vero in facere totam iusto similique quas sapiente earum ipsam aut? Praesentium saepe, eaque aspernatur sapiente facere iusto? Aliquam libero dolorum inventore, illo animi magni eius nulla cupiditate quis, alias qui minus ratione possimus itaque sapiente sint assumenda consectetur sit at earum quod. Porro earum blanditiis delectus animi libero iste praesentium at sequi cupiditate numquam corrupti facilis nihil necessitatibus dolorum temporibus odio laudantium omnis, eos voluptates ipsam dolore quis enim ex! Pariatur cumque obcaecati modi.
+  </p>
+<br />
+</div>
+
+<p class="accordion" id="a1">Panel 3</p>
+<div class="accordion-content" id="b1">
+  <p>
+    Text line 2
+    <br/>
+    <a href="https://readymag.com/examples" target="_blank">examples</a>
+    <br/>
+    Text line 3
+    <br/>
+    Text line 4
+  </p>
+  <br/>
+</div>
+
+<style>
+
+/* accordion title text styles */
+p.accordion {
+  font-family: Inter;
+  font-size: 18px;
+}
+
+/* accordion content text styles */
+.accordion-content p {
+  font-family: Inter; 
+  font-size: 14px;
+}
+
+/* accordion content link styles */
+.accordion-content a {
+  font-family: Inter;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* accordion title styles */
+  .accordion {
+  cursor: pointer;
+  padding: 15px 8px;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* accordion icon box styles */
+.accordion::after {
+  content: '✕';
+  float: right;
+  transform: rotate(-45deg);
+  font-size: 11px;
+  transition: .2s ease-out;
+}
+
+/* accordion icon box styles: opened  */  
+.active::after {
+  content: "✕";
+  transform: rotate(0deg);
+  font-size: 11px;
+}
+
+ /* accordion content box styles: default */
+.accordion-content {
+  padding: 0 8px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.2s ease-out;
+  border-bottom: 1px solid #999;
+}
+
+</style>
+
+<script>
+let accordionHeading = document.querySelectorAll("#a1");
+let accordionContent = document.querySelectorAll("#b1");
+
+for (let i = 0; i < accordionHeading.length; i++) {
+    accordionHeading[i].onclick = function () {
+        if (this.nextElementSibling.style.maxHeight) {
+            hideContent();
+        } else {
+            showContent(this);
+        }
+    };
+}
+
+function showContent(elem) {
+    hideContent();
+    elem.classList.add("active");
+    elem.nextElementSibling.style.maxHeight =
+    elem.nextElementSibling.scrollHeight + "px";
+}
+
+function hideContent() {
+    for (let i = 0; i < accordionContent.length; i++) {
+        accordionContent[i].style.maxHeight = null;
+        accordionHeading[i].classList.remove("active");
+    }
+}
+
+let accordionHeading2 = document.querySelectorAll("#a2");
+let accordionContent2 = document.querySelectorAll("#b2");
+
+</script>
+
+</body>
+</html>

@@ -1,38 +1,31 @@
 from telethon import TelegramClient
-from telethon.tl.functions.channels import (JoinChannelRequest,
-                                            LeaveChannelRequest)
+from telethon.tl.functions.channels import (
+    JoinChannelRequest,
+    LeaveChannelRequest
+)
 from telethon.errors.rpcerrorlist import FloodWaitError
 
-
-def get_api_keys():
-    print('2')
-    with open('~/.telegram_subscribe_app/user.txt', 'r') as f:
-        api_id, api_hash = f.read().split(', ')
-    print('3')
-    client = TelegramClient('anon', api_id, api_hash)
-    print('4')
-    with open('~/.telegram_subscribe_app/channels.txt', 'r') as f:
-        channels = f.read().split(', ')
-    print('5')
-    return client, channels
+from credentials import (
+    get_channels, get_id, get_hash, get_phone, get_password
+)
+from popup_windows import show_ok, show_error, enter_code
+from constants import SESSION_FILE_PATH
 
 
 async def main(client, channels, follow):
-    print('7')
     for channel in channels:
-        print('8', channel)
         if follow is True:
             try:
                 await client(JoinChannelRequest(channel))
+                show_ok()
             except FloodWaitError:
-                
+                show_error()
         else:
             await client(LeaveChannelRequest(channel))
+            show_ok()
 
 
 def follow_channels(follow=True):
-    print('1')
-    client, channels = get_api_keys()
-    print('6', client, channels)
-    with client:
-        client.loop.run_until_complete(main(client, channels, follow))
+    client = TelegramClient(str(SESSION_FILE_PATH), get_id(), get_hash())
+    client.start(get_phone, get_password, code_callback=enter_code())
+    client.loop.run_until_complete(main(client, get_channels(), follow))
