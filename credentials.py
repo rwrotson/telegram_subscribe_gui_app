@@ -3,8 +3,8 @@ from constants import USER_FILE_PATH, CHANNEL_FILE_PATH
 
 def get_credentials():
     with open(USER_FILE_PATH, 'r') as f:
-        api_id, api_hash, phone, password = f.read().split(', ')
-    return api_id, api_hash, phone, password
+        api_id, api_hash, phone = f.read().split(', ')
+    return api_id, api_hash, phone
 
 
 def get_id():
@@ -17,14 +17,6 @@ def get_hash():
 
 def get_phone():
     return get_credentials()[2]
-
-
-def get_password():
-    return get_credentials()[3]
-
-
-def get_2fa_code():
-    return ''
 
 
 def get_channels():

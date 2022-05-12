@@ -5,13 +5,17 @@ import wx
 
 
 class PopUpWindow(wx.Frame):
-    def __init__(self, pos=(500, 400)):
+    def __init__(self, pos=(500, 400), size=(300, 150)):
         super().__init__(
-            parent=None, size=(300, 200),
+            parent=None, size=size,
             pos=pos, style=wx.CLOSE_BOX
             )
         self.panel = wx.Panel(self)
         self.panel.SetBackgroundColour('white')
+        self.font_small = wx.Font(
+            10, wx.DEFAULT, wx.NORMAL,
+            wx.NORMAL, False, 'Trattatello'
+            )
         self.font = wx.Font(
             12, wx.DEFAULT, wx.NORMAL,
             wx.NORMAL, False, 'Trattatello'
@@ -43,19 +47,20 @@ class PopUpWindow(wx.Frame):
 
 
 class OKWindow(PopUpWindow):
-    def __init__(self, pos=(500, 400)):
-        super().__init__(pos)
+    def __init__(self, pos=(500, 400), size=(300, 150)):
+        super().__init__(pos, size)
         self.make_ok_button()
         self.make_text()
         self.set_text()
         self.make_layout()
 
     def make_text(self):
-        self.info_text = wx.StaticText(self.panel, size=(100, 50))
-        self.info_text.SetFont(self.font)
+        self.info_text = wx.StaticText(self.panel)
 
     def set_text(self):
+        self.info_text.SetFont(self.font)
         self.info_text.SetLabel('ОПЕРАЦИЯ ПРОШЛА УСПЕШНО!')
+        self.info_text.Wrap(250)
 
     def make_layout(self):
         self.vbox.Add(self.info_text, flag=wx.ALIGN_CENTER, proportion=0)
@@ -66,18 +71,20 @@ class OKWindow(PopUpWindow):
 
 
 class ErrorWindow(OKWindow):
-    def __init__(self, pos=(500, 400)):
-        super().__init__(pos)
+    def __init__(self, pos=(500, 400), size=(300, 350)):
+        super().__init__(pos, size)
         self.set_text()
 
     def set_text(self):
+        self.info_text.SetFont(self.font_small)
         txt = str(Path('texts/error.txt').read_text().upper())
         self.info_text.SetLabel(txt)
+        self.info_text.Wrap(250)
 
 
 class EnterCodeWindow(PopUpWindow):
-    def __init__(self, pos=(500, 400)):
-        super().__init__(pos)
+    def __init__(self, pos=(500, 400), size=(300, 200)):
+        super().__init__(pos, size)
         self.make_elements()
         self.make_ok_button()
         self.make_cancel_button()
@@ -111,6 +118,11 @@ class EnterCodeWindow(PopUpWindow):
         self.Close()
 
 
+class PasswordWindow(EnterCodeWindow):
+    def __init__(self, pos=(500, 400), size=(300, 200)):
+        pass
+
+
 def show_ok():
     ok_window = OKWindow()
     ok_window.Show()
@@ -125,6 +137,9 @@ def enter_code():
     code_window = EnterCodeWindow()
     code_window.Show()
     while hasattr(code_window, 'code_value') is False:
-        print(code_window)
         time.sleep(0.5)
     return code_window.code_value
+
+
+def enter_password():
+    pass

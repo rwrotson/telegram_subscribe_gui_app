@@ -7,7 +7,7 @@ import wx
 
 from telegram_api import follow_channels
 from constants import PREFS_FOLDER, USER_FILE_PATH, CHANNEL_FILE_PATH
-
+from popup_windows import OKWindow, ErrorWindow
 
 logging.basicConfig(
     filename="std.log",
@@ -115,6 +115,11 @@ class MainWindow(Window):
         self.Close()
         readme_window.Show()
 
+        ok_window = OKWindow()
+        ok_window.Show()
+        error_window = ErrorWindow()
+        error_window.Show()
+
     def OnUserClick(self, evt):
         position = self.GetPosition()
         user_window = UserWindow(position)
@@ -192,12 +197,6 @@ class UserWindow(SideWindow):
         self.phone_text = wx.StaticText(self.panel, size=(120, 40))
         self.phone_text.SetFont(self.font_large)
         self.phone_text.SetLabel('*PHONE NUMBER')
-        self.password_text = wx.StaticText(self.panel, size=(120, 40))
-        self.password_text.SetFont(self.font_large)
-        self.password_text.SetLabel('TG PASSWORD')
-        self.notice_text = wx.StaticText(self.panel)
-        self.notice_text.SetFont(self.font_smallest)
-        self.notice_text.SetLabel('ПОЛЯ С * ОБЯЗАТЕЛЬНЫ ДЛЯ ЗАПОЛНЕНИЯ')
 
     def make_inputs(self):
         self.id_input = UpperTextCtrl(self.panel, size=(180, 40))
@@ -206,8 +205,6 @@ class UserWindow(SideWindow):
         self.hash_input.SetFont(self.font_large)
         self.phone_input = UpperTextCtrl(self.panel, size=(180, 40))
         self.phone_input.SetFont(self.font_large)
-        self.password_input = UpperTextCtrl(self.panel, size=(180, 40))
-        self.password_input.SetFont(self.font_large)
 
     def fill_inputs(self):
         if os.path.exists(USER_FILE_PATH):
@@ -216,11 +213,9 @@ class UserWindow(SideWindow):
             self.id_input.WriteText(user)
             self.hash_input.WriteText(hash)
             self.phone_input.WriteText(phone)
-            self.password_input.WriteText(password)
 
     def make_layout(self):
         self.vbox.Add(self.info_text, flag=wx.ALIGN_CENTER, proportion=0)
-        self.vbox.Add(self.notice_text, flag=wx.ALIGN_CENTER, proportion=0)
         self.vbox.AddStretchSpacer()
 
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -242,16 +237,10 @@ class UserWindow(SideWindow):
         self.vbox.AddStretchSpacer()
 
         hbox4 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox4.Add(self.password_text, proportion=0)
-        hbox4.Add(self.password_input, proportion=0)
+        hbox4.Add(self.back_button, proportion=0)
+        hbox4.AddSpacer(20)
+        hbox4.Add(self.save_button, proportion=0)
         self.vbox.Add(hbox4, flag=wx.ALIGN_CENTER, proportion=0)
-        self.vbox.AddStretchSpacer()
-
-        hbox5 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox5.Add(self.back_button, proportion=0)
-        hbox5.AddSpacer(20)
-        hbox5.Add(self.save_button, proportion=0)
-        self.vbox.Add(hbox5, flag=wx.ALIGN_CENTER, proportion=0)
         self.vbox.AddStretchSpacer()
         self.panel.SetSizer(self.vbox)
 
@@ -264,8 +253,7 @@ class UserWindow(SideWindow):
             user_id = self.id_input.GetValue().strip(' ')
             user_hash = self.hash_input.GetValue().strip(' ')
             user_phone = self.phone_input.GetValue().strip(' ')
-            user_password = self.password_input.GetValue().strip(' ')
-            f.write(f'{user_id}, {user_hash}, {user_phone}, {user_password}')
+            f.write(f'{user_id}, {user_hash}, {user_phone}')
         self.OnBackClick(evt)
 
 
