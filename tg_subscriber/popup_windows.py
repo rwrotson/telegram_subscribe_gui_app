@@ -1,4 +1,4 @@
-import time
+import asyncio
 from pathlib import Path
 
 import wx
@@ -86,6 +86,7 @@ class EnterCodeWindow(PopUpWindow):
     def __init__(self, pos=(500, 400), size=(300, 200)):
         super().__init__(pos, size)
         self.make_elements()
+        self.set_info_text()
         self.make_ok_button()
         self.make_cancel_button()
         self.make_layout()
@@ -93,9 +94,11 @@ class EnterCodeWindow(PopUpWindow):
     def make_elements(self):
         self.code_text = wx.StaticText(self.panel)
         self.code_text.SetFont(self.font)
-        self.code_text.SetLabel('ВВЕДИТЕ КОД, ОТПРАВЛЕННЫЙ ВАМ В TELEGRAM')
         self.code_input = wx.TextCtrl(self.panel, size=(100, 40))
         self.code_input.SetFont(self.font_large)
+
+    def set_info_text(self):
+        self.code_text.SetLabel('ВВЕДИТЕ КОД, ОТПРАВЛЕННЫЙ ВАМ В TELEGRAM')
 
     def make_layout(self):
         self.vbox.Add(self.code_text, flag=wx.ALIGN_CENTER, proportion=0)
@@ -118,9 +121,13 @@ class EnterCodeWindow(PopUpWindow):
         self.Close()
 
 
-class PasswordWindow(EnterCodeWindow):
+class EnterPasswordWindow(EnterCodeWindow):
     def __init__(self, pos=(500, 400), size=(300, 200)):
-        pass
+        super().__init__(pos, size)
+        self.set_info_text()
+
+    def set_info_text(self):
+        self.code_text.SetLabel('ВВЕДИТЕ ПАРОЛЬ TELEGRAM')
 
 
 def show_ok():
@@ -133,13 +140,15 @@ def show_error():
     error_window.Show()
 
 
-def enter_code():
+async def enter_code():
     code_window = EnterCodeWindow()
     code_window.Show()
     while hasattr(code_window, 'code_value') is False:
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
     return code_window.code_value
 
 
 def enter_password():
-    pass
+    password_window = EnterPasswordWindow()
+    password_window.Show()
+    return password_window.code_value

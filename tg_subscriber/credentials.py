@@ -1,4 +1,4 @@
-from constants import USER_FILE_PATH, CHANNEL_FILE_PATH
+from tg_subscriber.constants import USER_FILE_PATH, CHANNEL_FILE_PATH
 
 
 def get_credentials():

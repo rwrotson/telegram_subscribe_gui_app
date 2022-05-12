@@ -6,13 +6,13 @@ from telethon.tl.functions.channels import (
 from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon.errors import SessionPasswordNeededError
 
-from credentials import (
+from tg_subscriber.credentials import (
     get_channels, get_id, get_hash, get_phone
 )
-from popup_windows import (
+from tg_subscriber.popup_windows import (
     show_ok, show_error, enter_code, enter_password
 )
-from constants import SESSION_FILE_PATH
+from tg_subscriber.constants import SESSION_FILE_PATH
 
 
 async def main(client, channels, follow):
@@ -32,11 +32,17 @@ async def follow_channels(follow=True):
     client = TelegramClient(str(SESSION_FILE_PATH), get_id(), get_hash())
     await client.connect()
     authorized = await client.is_user_authorized()
+    print('a', authorized)
     if not authorized:
+        print('not authorized')
         await client.sign_in(get_phone())
+        print('got phone')
         try:
-            await client.sign_in(code=input('Enter code: '))
+            code = await enter_code()
+            print(code)
+            await client.sign_in(code=code)
+            print('code accepted')
         except SessionPasswordNeededError:
-            await client.sign_in(password=input('Enter password: '))
-    #client.start(get_phone, get_password, code_callback=enter_code)
-    #client.loop.run_until_complete(main(client, get_channels(), follow))
+            await client.sign_in(password=enter_password())
+    print('authorized')
+    client.loop.run_until_complete(main(client, get_channels(), follow))

@@ -1,22 +1,14 @@
-import logging
 import os
 import string
 from pathlib import Path
+
 import wx
-from wxasync import AsyncBind, WxAsyncApp, StartCoroutine
-from asyncio.events import get_event_loop
+from wxasync import AsyncBind
 
-from telegram_api import follow_channels
-from constants import PREFS_FOLDER, USER_FILE_PATH, CHANNEL_FILE_PATH
-from popup_windows import OKWindow, ErrorWindow
-
-logging.basicConfig(
-    filename="std.log",
-    format='%(asctime)s %(message)s',
-    filemode='w'
-    )
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+from tg_subscriber.telegram_api import follow_channels
+from tg_subscriber.constants import (
+    PREFS_FOLDER, USER_FILE_PATH, CHANNEL_FILE_PATH
+)
 
 
 class UpperTextCtrl(wx.TextCtrl):
@@ -109,19 +101,12 @@ class MainWindow(Window):
         self.channels_button.Bind(wx.EVT_BUTTON, self.OnChannelsClick)
         AsyncBind(wx.EVT_BUTTON, self.OnFollowClick, self.follow_button)
         AsyncBind(wx.EVT_BUTTON, self.OnUnfollowClick, self.unfollow_button)
-        #self.follow_button.Bind(wx.EVT_BUTTON, self.OnFollowClick)
-        #self.unfollow_button.Bind(wx.EVT_BUTTON, self.OnUnfollowClick)
 
     def OnReadmeClick(self, evt):
         position = self.GetPosition()
         readme_window = ReadMeWindow(position)
         self.Close()
         readme_window.Show()
-
-        ok_window = OKWindow()
-        ok_window.Show()
-        error_window = ErrorWindow()
-        error_window.Show()
 
     def OnUserClick(self, evt):
         position = self.GetPosition()
@@ -212,7 +197,7 @@ class UserWindow(SideWindow):
     def fill_inputs(self):
         if os.path.exists(USER_FILE_PATH):
             with open(USER_FILE_PATH, 'r') as file:
-                user, hash, phone, password = file.read().split(', ')
+                user, hash, phone = file.read().split(', ')
             self.id_input.WriteText(user)
             self.hash_input.WriteText(hash)
             self.phone_input.WriteText(phone)
@@ -346,19 +331,3 @@ class ReadMeWindow(SideWindow):
         self.vbox.Add(self.back_button,  flag=wx.ALIGN_CENTER, proportion=0)
         self.vbox.AddStretchSpacer()
         self.panel.SetSizer(self.vbox)
-
-
-if __name__ == '__main__':
-    app = WxAsyncApp(0)
-    window = MainWindow()
-    window.Show()
-    loop = get_event_loop()
-    loop.run_until_complete(app.MainLoop())
-
-"""
-if __name__ == '__main__':
-    app = wx.App()
-    window = MainWindow()
-    window.Show()
-    app.MainLoop()
-"""
