@@ -1,3 +1,4 @@
 Telethon
 wxPython
+wxasync
 py2app

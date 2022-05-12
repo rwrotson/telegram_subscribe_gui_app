@@ -2,8 +2,9 @@ import logging
 import os
 import string
 from pathlib import Path
-
 import wx
+from wxasync import AsyncBind, WxAsyncApp, StartCoroutine
+from asyncio.events import get_event_loop
 
 from telegram_api import follow_channels
 from constants import PREFS_FOLDER, USER_FILE_PATH, CHANNEL_FILE_PATH
@@ -106,8 +107,10 @@ class MainWindow(Window):
         self.readme_button.Bind(wx.EVT_BUTTON, self.OnReadmeClick)
         self.user_button.Bind(wx.EVT_BUTTON, self.OnUserClick)
         self.channels_button.Bind(wx.EVT_BUTTON, self.OnChannelsClick)
-        self.follow_button.Bind(wx.EVT_BUTTON, self.OnFollowClick)
-        self.unfollow_button.Bind(wx.EVT_BUTTON, self.OnUnfollowClick)
+        AsyncBind(wx.EVT_BUTTON, self.OnFollowClick, self.follow_button)
+        AsyncBind(wx.EVT_BUTTON, self.OnUnfollowClick, self.unfollow_button)
+        #self.follow_button.Bind(wx.EVT_BUTTON, self.OnFollowClick)
+        #self.unfollow_button.Bind(wx.EVT_BUTTON, self.OnUnfollowClick)
 
     def OnReadmeClick(self, evt):
         position = self.GetPosition()
@@ -132,11 +135,11 @@ class MainWindow(Window):
         self.Close()
         channels_window.Show()
 
-    def OnFollowClick(self, evt):
-        follow_channels()
+    async def OnFollowClick(self, evt):
+        await follow_channels()
 
-    def OnUnfollowClick(self, evt):
-        follow_channels(follow=False)
+    async def OnUnfollowClick(self, evt):
+        await follow_channels(follow=False)
 
 
 class SideWindow(Window):
@@ -346,7 +349,16 @@ class ReadMeWindow(SideWindow):
 
 
 if __name__ == '__main__':
+    app = WxAsyncApp(0)
+    window = MainWindow()
+    window.Show()
+    loop = get_event_loop()
+    loop.run_until_complete(app.MainLoop())
+
+"""
+if __name__ == '__main__':
     app = wx.App()
     window = MainWindow()
     window.Show()
     app.MainLoop()
+"""

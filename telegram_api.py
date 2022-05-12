@@ -28,21 +28,15 @@ async def main(client, channels, follow):
             show_ok()
 
 
-def follow_channels(follow=True):
+async def follow_channels(follow=True):
     client = TelegramClient(str(SESSION_FILE_PATH), get_id(), get_hash())
-    client.connect()
-    print('1111', client.is_user_authorized())
-    """
-    client.connect()
-    client.is_user_authorized()
-    if not client.is_user_authorized():
-        client.sign_in(get_phone())
+    await client.connect()
+    authorized = await client.is_user_authorized()
+    if not authorized:
+        await client.sign_in(get_phone())
         try:
-            print('1111')
-            client.sign_in(code=input('Enter code: '))
+            await client.sign_in(code=input('Enter code: '))
         except SessionPasswordNeededError:
-            print('2222')
-            client.sign_in(password=input('Enter password: '))
-    """
+            await client.sign_in(password=input('Enter password: '))
     #client.start(get_phone, get_password, code_callback=enter_code)
     #client.loop.run_until_complete(main(client, get_channels(), follow))
