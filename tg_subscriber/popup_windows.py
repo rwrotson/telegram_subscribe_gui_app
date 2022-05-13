@@ -31,7 +31,8 @@ class PopUpWindow(wx.Frame):
         self.ok_button = wx.BitmapButton(
             self.panel, -1, wx.Bitmap('images/ok.bmp'), size=(70, 50)
             )
-        self.Bind(wx.EVT_BUTTON, self.OnOKClick)
+        #AsyncBind(wx.EVT_BUTTON, self.OnOKClick, self.ok_button)
+        self.ok_button.Bind(wx.EVT_BUTTON, self.OnOKClick)
 
     def make_cancel_button(self):
         self.cancel_button = wx.BitmapButton(
@@ -40,6 +41,7 @@ class PopUpWindow(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnCancelClick)
 
     def OnOKClick(self, evt):
+        print('test')
         self.Close()
 
     def OnCancelClick(self, evt):
@@ -90,6 +92,7 @@ class EnterCodeWindow(PopUpWindow):
         self.make_ok_button()
         self.make_cancel_button()
         self.make_layout()
+        self.code_value = asyncio.Future()
 
     def make_elements(self):
         self.code_text = wx.StaticText(self.panel)
@@ -114,8 +117,11 @@ class EnterCodeWindow(PopUpWindow):
         self.panel.SetSizer(self.vbox)
 
     def OnOKClick(self, evt):
-        self.code_value = self.code_input.GetValue().strip(' ')
+        self.code_value.set_result(self.code_input.GetValue().strip(' '))
+        print('5555')
+        print(self.code_value)
         self.Close()
+        print('6666')
 
     def OnCancelClick(self, evt):
         self.Close()
@@ -143,9 +149,16 @@ def show_error():
 async def enter_code():
     code_window = EnterCodeWindow()
     code_window.Show()
-    while hasattr(code_window, 'code_value') is False:
-        await asyncio.sleep(0.5)
-    return code_window.code_value
+    print('window showed')
+    var = await code_window.code_value
+    print(var)
+    return var
+
+
+def enter_window():
+    code_window = EnterCodeWindow()
+    code_window.Show()
+    return code_window
 
 
 def enter_password():

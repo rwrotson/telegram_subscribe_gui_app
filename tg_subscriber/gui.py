@@ -1,6 +1,7 @@
 import os
 import string
 from pathlib import Path
+import asyncio
 
 import wx
 from wxasync import AsyncBind
@@ -99,8 +100,10 @@ class MainWindow(Window):
         self.readme_button.Bind(wx.EVT_BUTTON, self.OnReadmeClick)
         self.user_button.Bind(wx.EVT_BUTTON, self.OnUserClick)
         self.channels_button.Bind(wx.EVT_BUTTON, self.OnChannelsClick)
-        AsyncBind(wx.EVT_BUTTON, self.OnFollowClick, self.follow_button)
-        AsyncBind(wx.EVT_BUTTON, self.OnUnfollowClick, self.unfollow_button)
+        self.follow_button.Bind(wx.EVT_BUTTON, self.OnFollowClick)
+        self.unfollow_button.Bind(wx.EVT_BUTTON, self.OnUnfollowClick)
+        #AsyncBind(wx.EVT_BUTTON, self.OnFollowClick, self.follow_button)
+        #AsyncBind(wx.EVT_BUTTON, self.OnUnfollowClick, self.unfollow_button)
 
     def OnReadmeClick(self, evt):
         position = self.GetPosition()
@@ -120,11 +123,11 @@ class MainWindow(Window):
         self.Close()
         channels_window.Show()
 
-    async def OnFollowClick(self, evt):
-        await follow_channels()
+    def OnFollowClick(self, evt):
+        asyncio.get_running_loop().run_until_complete(follow_channels())
 
-    async def OnUnfollowClick(self, evt):
-        await follow_channels(follow=False)
+    def OnUnfollowClick(self, evt):
+        asyncio.get_running_loop().run_until_complete(follow_channels(follow=False))
 
 
 class SideWindow(Window):
