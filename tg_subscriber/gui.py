@@ -30,6 +30,9 @@ class UpperTextCtrl(wx.TextCtrl):
 
 
 class Window(wx.Frame):
+    """
+    Abstract class for all windows in app
+    """
     def __init__(self, pos=(200, 100)):
         super().__init__(
             parent=None, title='follow / unfollow', size=(400, 500), pos=pos,
@@ -124,6 +127,7 @@ class MainWindow(Window):
         channels_window.Show()
 
     def OnFollowClick(self, evt):
+        print('111111')
         asyncio.get_running_loop().run_until_complete(follow_channels())
 
     def OnUnfollowClick(self, evt):
@@ -131,6 +135,9 @@ class MainWindow(Window):
 
 
 class SideWindow(Window):
+    """
+    Abstract class for all app windows except main
+    """
     def __init__(self, pos):
         super().__init__(pos)
 
@@ -167,6 +174,9 @@ class SideWindow(Window):
 
 
 class UserWindow(SideWindow):
+    """
+    Input window for user's credentials 
+    """
     def __init__(self, pos):
         super().__init__(pos)
         self.make_save_button()
@@ -249,6 +259,9 @@ class UserWindow(SideWindow):
 
 
 class ChannelsWindow(SideWindow):
+    """
+    Input window for list of channels for subscriptions
+    """
     def __init__(self, pos):
         super().__init__(pos)
 
@@ -313,6 +326,9 @@ class ChannelsWindow(SideWindow):
 
 
 class ReadMeWindow(SideWindow):
+    """
+    Info window with instructions to app
+    """
     def __init__(self, pos):
         super().__init__(pos)
 

@@ -15,7 +15,7 @@ from tg_subscriber.popup_windows import (
 from tg_subscriber.constants import SESSION_FILE_PATH
 
 
-async def main(client, channels, follow):
+async def subscribe(client, channels, follow):
     print('channels', channels)
     for channel in channels:
         if follow is True:
@@ -26,11 +26,12 @@ async def main(client, channels, follow):
                 show_error()
         else:
             result = await client(LeaveChannelRequest(channel))
-            print('relust', result)
+            print('result', result)
             show_ok()
 
 
 async def follow_channels(follow=True):
+    print('0000')
     client = TelegramClient(str(SESSION_FILE_PATH), get_id(), get_hash())
     await client.connect()
     if not await client.is_user_authorized():
@@ -58,5 +59,5 @@ async def follow_channels(follow=True):
             await client.sign_in(password=enter_password())
     print('authorized')
     """
-    await main(client, get_channels(), follow)
+    await subscribe(client, get_channels(), follow)
     print('final_print')
